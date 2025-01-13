@@ -27,14 +27,16 @@ class RemoteFeedLoaderTests: XCTestCase {
     func test_load_deliversErrorOnClientError() async {
         let (sut, client) = makeSUT()
         client.error = NSError(domain: "Test", code: 0)
+        var capturedErrors = [RemoteFeedLoader.Error?]()
         
         do {
             try await sut.load()
             XCTFail("Expected an error")
-        } catch  {
-            XCTAssertTrue(error is RemoteFeedLoader.Error)
-                   XCTAssertEqual(error as? RemoteFeedLoader.Error, .connectivity)
+        } catch {
+            capturedErrors.append(error as? RemoteFeedLoader.Error)
         }
+        
+        XCTAssertEqual(capturedErrors, [.connectivity])
     }
     
     // MARK: - Helpers
